@@ -1,0 +1,43 @@
+name: Terraform Apply, Docker Build and Push to ACR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    
+    - name: Get ACR credentials
+      id: get-acr-creds
+      run: |
+        echo "::set-output name=acr_login_server::$(terraform output -raw acr_login_server)"
+        echo "::set-output name=acr_token_username::$(terraform output -raw acr_token_username)"
+        echo "::set-output name=acr_token_password::$(terraform output -raw acr_token_password)"
+
+    - name: Login to Azure Container Registry
+      run: echo ${{ steps.get-acr-creds.outputs.acr_token_password }} | docker login ${{ steps.get-acr-creds.outputs.acr_login_server }} -u ${{ steps.get-acr-creds.outputs.acr_token_username }} --password-stdin
+
+    - name: Build and Push Docker image
+      run: |
+        docker build . -t ${{ steps.get-acr-creds.outputs.acr_login_server }}/my-repo-name:latest
+        docker push ${{ steps.get-acr-creds.outputs.acr_login_server }}/my-repo-name:latest
