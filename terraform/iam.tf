@@ -6,13 +6,13 @@ resource "azurerm_role_assignment" "acrpull_role" {
 }
 
 resource "azurerm_role_assignment" "acrpush_role" {
-  principal_id            = var.principal_id
+  principal_id            = "dcc8f324-b693-46b4-b11a-62cfe8cfaea3"
   role_definition_name    = "AcrPush"  
   scope                   = azurerm_container_registry.acr.id
 }
 
 resource "azurerm_role_assignment" "contributor_role" {
-  principal_id         = var.principal_id
+  principal_id         = "dcc8f324-b693-46b4-b11a-62cfe8cfaea3"
   role_definition_name = "Contributor"
-  scope                = "/subscriptions/${var.subscription_id}"
+  scope                = "/subscriptions/7e349100-77f0-4750-9bff-354325c60926"
 }
