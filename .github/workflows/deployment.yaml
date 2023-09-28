@@ -44,3 +44,16 @@ jobs:
       run: |
         docker build . -t ${{ steps.get-acr-creds.outputs.acr_login_server }}/my-repo-name:latest
         docker push ${{ steps.get-acr-creds.outputs.acr_login_server }}/my-repo-name:latest
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Configure kubectl with AKS kubeconfig
+      run: |
+        az aks get-credentials --resource-group YourResourceGroup --name YourAKSClusterName --overwrite-existing
+
+    - name: Apply Kustomization to AKS cluster
+      run: |
+        kubectl apply -k ./namespaces/postgresql
