@@ -36,7 +36,7 @@ variable "dns_prefix" {
 }
 
 variable "ssh_public_key" {
-  default = "~/.ssh/id_rsa_jolopez.pub"
+  default = "./ssh_keys/id_rsa_jolopez.pub"
 }
 
 variable "azure_tags" {

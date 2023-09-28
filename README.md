@@ -14,7 +14,11 @@ az account set --subscription "Azure subscription 1"
 # Manually create service principal for k8s cluster
 az ad sp create-for-rbac --name aks_sp 
 # Manually create sp for acr push (gh actions)
+```
 az ad sp create-for-rbac --name docker_push_sp
+az ad sp show --id 68038eaf-b599-46d3-acef-227ebe7ce63b --query id -o tsv
+```
+Save the output in the variable principal_id under tfvars
 # Create execution plan
 terraform plan -out main.tfplan
 # Apply execution plan
